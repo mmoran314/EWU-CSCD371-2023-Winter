@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.IO;
 
 namespace PrincessBrideTrivia.Tests
@@ -85,6 +86,26 @@ namespace PrincessBrideTrivia.Tests
                 lines[4] = "2";
                 File.AppendAllLines(filePath, lines);
             }
+        }
+        [TestMethod]
+        public void GetCorrectAnswer_ReturnsExpectedString()
+        {
+            //Arrange 
+            Question question = new Question();
+            question.Text = "This is the question text";
+            question.Answers = new string[3];
+            question.Answers[0] = "uno";
+            question.Answers[1] = "dos";
+            question.Answers[2] = "tres";
+            question.CorrectAnswerIndex = "2";
+            int answerIndex = Int32.Parse(question.CorrectAnswerIndex) - 1;
+            string expectedResult = question.Answers[answerIndex];
+
+            //Act
+            string correctAnswer = Program.GetCorrectAnswer(question);
+
+            //Assert
+            Assert.AreEqual(expectedResult, correctAnswer);
         }
     }
 }

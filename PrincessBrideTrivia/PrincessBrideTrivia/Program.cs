@@ -18,13 +18,19 @@ namespace PrincessBrideTrivia
                 {
                     numberCorrect++;
                 }
+                else //Added these lines to display the correct answer if the user has an incorrect guess
+                {
+                    Console.WriteLine($"Correct answer: {GetCorrectAnswer(questions[i])}");
+                }
             }
             Console.WriteLine("You got " + GetPercentCorrect(numberCorrect, questions.Length) + " correct");
         }
 
-        public static string GetPercentCorrect(int numberCorrectAnswers, int numberOfQuestions)
+        public static string GetPercentCorrect(double numberCorrectAnswers, int numberOfQuestions)
         {
-            return (numberCorrectAnswers / numberOfQuestions * 100) + "%";
+            // This method is fixed by calling the argument numberCorrectAnswers as doubles in order to properly divide them
+            double correctPercentage = (numberCorrectAnswers / numberOfQuestions) * 100;
+            return (correctPercentage) + "%";
         }
 
         public static bool AskQuestion(Question question)
@@ -47,7 +53,7 @@ namespace PrincessBrideTrivia
                 Console.WriteLine("Correct");
                 return true;
             }
-
+            
             Console.WriteLine("Incorrect");
             return false;
         }
@@ -89,8 +95,17 @@ namespace PrincessBrideTrivia
                 question.Answers[1] = answer2;
                 question.Answers[2] = answer3;
                 question.CorrectAnswerIndex = correctAnswerIndex;
+
+                questions[i] = question; // Added in this line of code
             }
             return questions;
+        }
+        
+        public static string GetCorrectAnswer(Question question) // Added method that returns correct answer
+        {
+            int answerIndex = Int32.Parse(question.CorrectAnswerIndex) - 1;
+            string correctAnswer = question.Answers[answerIndex];
+            return (correctAnswer);
         }
     }
 }
