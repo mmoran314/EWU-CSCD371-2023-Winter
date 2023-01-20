@@ -26,10 +26,10 @@ namespace PrincessBrideTrivia
             Console.WriteLine("You got " + GetPercentCorrect(numberCorrect, questions.Length) + " correct");
         }
 
-        public static string GetPercentCorrect(double numberCorrectAnswers, int numberOfQuestions)
+        public static string GetPercentCorrect(int numberCorrectAnswers, int numberOfQuestions)
         {
             // This method is fixed by calling the argument numberCorrectAnswers as doubles in order to properly divide them
-            double correctPercentage = (numberCorrectAnswers / numberOfQuestions) * 100;
+            double correctPercentage = ((double)numberCorrectAnswers / numberOfQuestions) * 100;
             return (correctPercentage) + "%";
         }
 
