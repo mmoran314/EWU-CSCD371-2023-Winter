@@ -58,7 +58,7 @@ namespace CanHazFunny.Tests
             jester.WriteJoke(testJoke);
 
             //Assert
-            Assert.AreEqual(testJoke, stringWriter.ToString());
+            Assert.AreEqual<string>(testJoke, stringWriter.ToString());
         }
 
         //[TestMethod]
