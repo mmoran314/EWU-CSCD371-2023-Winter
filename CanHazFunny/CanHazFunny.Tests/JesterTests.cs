@@ -98,6 +98,23 @@ namespace CanHazFunny.Tests
             Assert.AreEqual<string>("He who shall not be named", testJoke);
 
         }
+        [TestMethod]
+        public void TestMockedJokeOutput()
+        {
+            //Arrange
+
+            _jokeServiceMock.SetupSequence(x => x.GetJoke())
+        
+                .Returns("This is a joke");
+
+            //Act
+
+            string testJoke = _jester.TellJoke();
+
+            //Assert
+            Assert.AreEqual<string>("This is a joke", testJoke);
+
+        }
 
 
         [TestMethod]
