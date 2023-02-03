@@ -2,12 +2,22 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace CanHazFunny.Tests
 {
     [TestClass]
     public class JesterTests
     {
+        private readonly Jester _jester;
+        private readonly Mock<IJokeService> _jokeServiceMock = new Mock<IJokeService>();
+        private readonly Mock<IJokeOutput> _outputMock = new Mock<IJokeOutput>();
+
+        public JesterTests()
+        {
+            _jester = new Jester(_outputMock.Object, _jokeServiceMock.Object);
+        }
+
         [TestMethod]
         public void CreateJester_Success()
         {
@@ -22,14 +32,25 @@ namespace CanHazFunny.Tests
         }
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void CreateJester_Failure()
+        public void CreateJester_FailureGivenNullJokeOutput()
         {
             // Arrange
             ReallyCoolJokeOutput reallyCoolJokeOutput = new ReallyCoolJokeOutput();
             JokeService jokeService = new JokeService();
 
             //Act
-            Jester jester = new Jester(null!, null!); // use null forgiveness here to test argument null exception
+            Jester jester = new Jester(null!, jokeService); // use null forgiveness here to test argument null exception
+        }
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CreateJester_FailureGivenNullJokeServicet()
+        {
+            // Arrange
+            ReallyCoolJokeOutput reallyCoolJokeOutput = new ReallyCoolJokeOutput();
+            JokeService jokeService = new JokeService();
+
+            //Act
+            Jester jester = new Jester(reallyCoolJokeOutput, null!); // use null forgiveness here to test argument null exception
         }
 
         [TestMethod]
@@ -60,28 +81,24 @@ namespace CanHazFunny.Tests
             //Assert
             Assert.AreEqual<string>(testJoke, stringWriter.ToString());
         }
+        [TestMethod]
+        public void TestChuckNorrisFilterMock()
+        {
+            //Arrange
+            
+            _jokeServiceMock.SetupSequence(x => x.GetJoke())
+                .Returns("Chuck Norris")
+                .Returns("He who shall not be named");
 
-        //[TestMethod]
-        //public void TestJokeNotChuckNorris()
-        //{
-        //    //Arrange
-        //    Jester jester = new Jester(new ReallyCoolJokeOutput(), new JokeService());
-        //    var mock = new Mock<IJokeService>();
-        //    mock.Setup(x => x.GetJoke())
+            //Act
+            
+            string testJoke = _jester.TellJoke();
 
-        //        .Returns("Chuck Norris");
-                
+            //Assert
+            Assert.AreEqual<string>("He who shall not be named", testJoke);
 
+        }
 
-        //    var stringWriter = new StringWriter();
-        //    Console.SetOut(stringWriter);
-
-        //    //Act
-        //    jester.TellJoke();
-
-        //    //Assert
-
-        //}
 
         [TestMethod]
         public void TestJokeConsoleOutputNotChuckNorris()
@@ -92,7 +109,7 @@ namespace CanHazFunny.Tests
 
             //Act
             Console.SetOut(stringWriter);
-            string testJoke = jester.GetJoke();
+            string testJoke = jester.TellJoke();
             jester.WriteJoke(testJoke);
             
 

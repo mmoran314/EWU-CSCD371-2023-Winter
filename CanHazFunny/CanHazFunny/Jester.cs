@@ -41,7 +41,7 @@ public class Jester : IJokeOutput, IJokeService
     }
 
     
-    public void TellJoke()
+    public string TellJoke()
     {
         string testJoke = GetJoke();
         bool isChuckNorris = true;
@@ -57,6 +57,7 @@ public class Jester : IJokeOutput, IJokeService
         }
 
         ReallyCoolJokeOutput.WriteJoke(testJoke);
+        return testJoke;
     }
     public string GetJoke()
     {
