@@ -32,6 +32,43 @@ public class RecordTests
         //Assert
         Assert.IsNotNull(student);
     }
+    
+    [TestMethod]
+    public void Student_ReturnsName()
+    {
+        //Arrange
+        Student student = new Student(testFullName, "Junior", "Accounting");
+
+        //Act
+        string expectedString = "John Doe";
+
+        //Assert
+        Assert.AreEqual(expectedString, student.Name);
+    }
+    [TestMethod]
+    public void Employee_ReturnsName()
+    {
+        //Arrange
+        Employee employee = new(testFullName, 500000000, "Janitor");
+
+        //Act
+        string expectedString = "John Doe";
+
+        //Assert
+        Assert.AreEqual(expectedString, employee.Name);
+    }
+    [TestMethod]
+    public void Book_ReturnsName()
+    {
+        //Arrange
+        Book book = new(testFullName, "Da Book", "1234-5678");
+
+        //Act
+        string expectedString = "John Doe";
+
+        //Assert
+        Assert.AreEqual(expectedString, book.Name);
+    }
 
     [TestMethod]
     public void CreateEmployee_Success() 

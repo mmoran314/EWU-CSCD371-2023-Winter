@@ -14,5 +14,6 @@ public record struct FullName(string First, string Last, string? Middle = null)
     // It is ok if Middle is null in this case as it is optional
     public string? Middle { get; } = Middle ?? null!;
 
-    public string Name => ($"{First} {Middle} {Last}");
+    
+    public string Name => Middle == null ? $"{First} {Last}" : $"{First} {Middle} {Last}";
 }

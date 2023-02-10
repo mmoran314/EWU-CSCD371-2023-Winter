@@ -26,6 +26,21 @@ public class StorageTests
         //Assert
         Assert.IsTrue(storage.Contains(testBook));
     }
+    [TestMethod]
+    public void Test_AddMultipleItems()
+    {
+        //Arrange
+        Book testBook = new Book(testFullName, "My Book", "1234-5678");
+        Employee employee = new(testFullName, 50000, "Janitor");
+        Storage storage = new Storage();
+
+        //Act
+        storage.Add(testBook);
+        storage.Add(employee);
+
+        //Assert
+        Assert.IsTrue(storage.Contains(employee) && storage.Contains(testBook));
+    }
 
     [TestMethod]
     public void Test_Get()

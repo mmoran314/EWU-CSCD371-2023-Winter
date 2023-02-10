@@ -46,4 +46,28 @@ public class FullNameTests
         Assert.IsNotNull(fullName);
 
     }
+    [TestMethod]
+    public void FullName_ReturnsProperName()
+    {
+        //Arrange
+        FullName fullName = new FullName("Donald", "Trump", "John");
+
+        //Act
+        string expectedName = "Donald John Trump";
+
+        //Assert
+        Assert.AreEqual<string>(fullName.Name, expectedName);
+    }
+    [TestMethod]
+    public void FullName_ReturnsProperName_NoMiddle()
+    {
+        //Arrange
+        FullName fullName = new FullName("Donald", "Trump", null);
+
+        //Act
+        string expectedName = "Donald Trump";
+
+        //Assert
+        Assert.AreEqual<string>(fullName.Name, expectedName);
+    }
 }
