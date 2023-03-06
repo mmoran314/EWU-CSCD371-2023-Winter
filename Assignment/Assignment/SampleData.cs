@@ -22,10 +22,17 @@ namespace Assignment
 
         // 3.
         public string GetAggregateSortedListOfStatesUsingCsvRows()
-            => throw new NotImplementedException();
+        {
+            IEnumerable<string> sortedStateList = GetUniqueSortedListOfStatesGivenCsvRows();
+            string[] states = sortedStateList.ToArray();
+
+            return string.Join(", ", states);
+        }
+            
 
         // 4.
         public IEnumerable<IPerson> People => throw new NotImplementedException();
+
 
         // 5.
         public IEnumerable<(string FirstName, string LastName)> FilterByEmailAddress(
