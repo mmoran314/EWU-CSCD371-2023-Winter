@@ -31,7 +31,31 @@ namespace Assignment
             
 
         // 4.
-        public IEnumerable<IPerson> People => throw new NotImplementedException();
+        public IEnumerable<IPerson> People 
+        {
+            get
+            {
+                List<Person> persons = new List<Person>();
+                foreach (string row in CsvRows)
+                {
+                    string[] personInfo = row.Split(",");
+                    string first = personInfo[1];
+                    string last = personInfo[2];
+                    string email = personInfo[3];
+                    string streetAddress = personInfo[4];
+                    string city = personInfo[5];
+                    string state = personInfo[6];
+                    string zip = personInfo[7];
+
+                    Address personAddress = new(streetAddress, city, state, zip);
+                    Person person = new(first, last, personAddress, email);
+
+                    persons.Add(person);
+                }
+                return persons.OrderBy(person => person.Address.State);
+            }
+        }
+
 
 
         // 5.

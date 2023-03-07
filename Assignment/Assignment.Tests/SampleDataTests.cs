@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Immutable;
 using System.ComponentModel;
-
+using System.Linq;
 namespace Assignment;
 
 [TestClass]
@@ -73,9 +73,6 @@ public class SampleDataTests
     [TestMethod]
     public void TestAggregateStateListReturnsProperString()
     {
-        //Arrange
-        IEnumerable<string> csv = File.ReadLines(filePath).Skip(1);
-        IEnumerable<string> expected = csv.Select(row => row.Split(",")[6]).Distinct().ToImmutableSortedSet();
         
         //Act
         string actual = sampleData.GetAggregateSortedListOfStatesUsingCsvRows();
@@ -84,6 +81,28 @@ public class SampleDataTests
         Assert.AreEqual<string>(actual, "AL, AZ, CA, DC, FL, GA, IN, KS, LA, MD, MN, MO, MT, NC, NE, NH, NV, NY," +
             " OR, PA, SC, TN, TX, UT, VA, WA, WV");
     }
+
+    [TestMethod]
+    public void ReturnsProperlySortedList()
+    { //TODO Consider changing this test
+        //Arrange
+        IEnumerable<IPerson> actual = sampleData.People;
+        List<Person> expected = new();
+        expected.Add(new Person("Arthur", "Myles", new Address("4718 Thackeray Pass", "Mobile", "AL", "37308"), "amyles1c@miibeian.gov.cn"));
+        expected.Add(new Person("Molly", "Jeannot", new Address("00546 International Alley", "Tucson", "AZ", "94123"), "mjeannotp@google.ca"));
+        //Act
+        for (int i = 0; i <2; i++)
+        {
+            Assert.AreEqual<string>(expected.ElementAt(i).FirstName, actual.ElementAt(i).FirstName);
+            Assert.AreEqual<string>(expected.ElementAt(i).LastName, actual.ElementAt(i).LastName);
+            Assert.AreEqual<string>(expected.ElementAt(i).EmailAddress, actual.ElementAt(i).EmailAddress);
+            Assert.AreEqual<string>(expected.ElementAt(i).Address.ToString()!, actual.ElementAt(i).Address.ToString()!);
+        }
+
+    }
+    
+
+
 
 }
 
