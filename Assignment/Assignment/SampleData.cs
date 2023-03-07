@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Text;
 
 namespace Assignment
 {
@@ -59,11 +60,31 @@ namespace Assignment
 
 
         // 5.
-        public IEnumerable<(string FirstName, string LastName)> FilterByEmailAddress(
-            Predicate<string> filter) => throw new NotImplementedException();
-
+        public IEnumerable<(string FirstName, string LastName)> FilterByEmailAddress(Predicate<string> filter)
+        {
+            //IEnumerable<(string, string)> filtered = People.Where(person => filter(person.EmailAddress)).ToList();
+            List<IPerson> filtered = People.Where(person => filter(person.EmailAddress)).ToList();
+            List<(string, string)> personList = new List<(string, string)>();
+            foreach (IPerson person in filtered)
+            {
+                personList.Add((person.FirstName, person.LastName));
+            }
+            return personList;
+        }
+            
         // 6.
-        public string GetAggregateListOfStatesGivenPeopleCollection(
-            IEnumerable<IPerson> people) => throw new NotImplementedException();
+        public string GetAggregateListOfStatesGivenPeopleCollection(IEnumerable<IPerson> people)
+        {
+            IEnumerable<string> states = People.Select(p => p.Address.State).Distinct();
+            StringBuilder statesString = states.Aggregate(new StringBuilder(), (a, b) => {
+                if (a.Length > 0)
+                {
+                    a.Append(", ");
+                }
+                a.Append(b);
+                return a;
+            });
+            return statesString.ToString();
+        }
     }
 }

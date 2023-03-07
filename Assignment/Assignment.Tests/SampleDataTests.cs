@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Linq;
@@ -83,7 +84,7 @@ public class SampleDataTests
     }
 
     [TestMethod]
-    public void ReturnsProperlySortedList()
+    public void ReturnsProperlySortedPeopleList()
     { //TODO Consider changing this test
         //Arrange
         IEnumerable<IPerson> actual = sampleData.People;
@@ -96,13 +97,44 @@ public class SampleDataTests
             Assert.AreEqual<string>(expected.ElementAt(i).FirstName, actual.ElementAt(i).FirstName);
             Assert.AreEqual<string>(expected.ElementAt(i).LastName, actual.ElementAt(i).LastName);
             Assert.AreEqual<string>(expected.ElementAt(i).EmailAddress, actual.ElementAt(i).EmailAddress);
+            // Use null forgiveness, will not be null
             Assert.AreEqual<string>(expected.ElementAt(i).Address.ToString()!, actual.ElementAt(i).Address.ToString()!);
         }
 
     }
-    
 
+    [TestMethod]
+    public void TestEmailFilterReturnsProperName_GivenExactyEmail()
+    {
+        //Arrange
+        IEnumerable<(string FirstName, string LastName)> people = sampleData.FilterByEmailAddress(email => email == "baspin1a@myspace.com");
 
+        //Act
+        Assert.AreEqual<(string, string)>(("Buck", "Aspin"), people.ElementAt(0));
+        
+    }
+
+    [TestMethod]
+    public void TestEmailFilterReturnsProperList_GivenDomain()
+    {
+        //Arrange
+        IEnumerable<(string FirstName, string LastName)> people = sampleData.FilterByEmailAddress(email => email.Contains(".com"));
+
+        //Assert
+        Assert.AreEqual<int>(people.Count(), 29);
+        
+    }
+
+    [TestMethod]
+    public void TestStateListGivenPeopleReturnsDistinctList()
+    {
+        //Arrange
+        IEnumerable<IPerson> actual = sampleData.People;
+
+        //Assert
+        Assert.AreEqual<string>("AL, AZ, CA, DC, FL, GA, IN, KS, LA, MD, MN, MO, MT, NC, NE, NH, NV, NY," +
+            " OR, PA, SC, TN, TX, UT, VA, WA, WV", sampleData.GetAggregateListOfStatesGivenPeopleCollection(actual));
+    }
 
 }
 
