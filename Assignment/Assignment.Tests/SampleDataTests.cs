@@ -77,29 +77,16 @@ public class SampleDataTests
         //Arrange
         IEnumerable<string> presortedList = sampleData.GetUniqueSortedListOfStatesGivenCsvRows();
         string expected = string.Join(", ", presortedList);
-        //foreach(string state in presortedList)
-        //{
-        //    if (!state.Equals("WV"))
-        //    {
-        //        expected = expected + state = ", "
-        //    }
-        //    else
-        //    {
-        //        expected.Concat(state);
-        //    }
-        //}
-            //Act
+     
+        //Act
         string actual = sampleData.GetAggregateSortedListOfStatesUsingCsvRows();
-
-        //Assert
-        //Assert.AreEqual<string>(actual, "AL, AZ, CA, DC, FL, GA, IN, KS, LA, MD, MN, MO, MT, NC, NE, NH, NV, NY," +
-        //    " OR, PA, SC, TN, TX, UT, VA, WA, WV");
+;
         Assert.AreEqual<string>(expected, actual);
     }
 
     [TestMethod]
     public void ReturnsProperlySortedPeopleList()
-    { //TODO Consider changing this test
+    { 
         //Arrange
         IEnumerable<IPerson> actual = sampleData.People;
         List<Person> expected = new();
@@ -111,8 +98,9 @@ public class SampleDataTests
             Assert.AreEqual<string>(expected.ElementAt(i).FirstName, actual.ElementAt(i).FirstName);
             Assert.AreEqual<string>(expected.ElementAt(i).LastName, actual.ElementAt(i).LastName);
             Assert.AreEqual<string>(expected.ElementAt(i).EmailAddress, actual.ElementAt(i).EmailAddress);
-            // Use null forgiveness, will not be null
-            Assert.AreEqual<string>(expected.ElementAt(i).Address.ToString()!, actual.ElementAt(i).Address.ToString()!);
+            Assert.AreEqual<string>(expected.ElementAt(i).Address.State, actual.ElementAt(i).Address.State);
+            Assert.AreEqual<string>(expected.ElementAt(i).Address.City, actual.ElementAt(i).Address.City);
+            Assert.AreEqual<string>(expected.ElementAt(i).Address.Zip, actual.ElementAt(i).Address.Zip);
         }
 
     }
