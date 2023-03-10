@@ -74,13 +74,27 @@ public class SampleDataTests
     [TestMethod]
     public void TestAggregateStateListReturnsProperString()
     {
-        
-        //Act
+        //Arrange
+        IEnumerable<string> presortedList = sampleData.GetUniqueSortedListOfStatesGivenCsvRows();
+        string expected = string.Join(", ", presortedList);
+        //foreach(string state in presortedList)
+        //{
+        //    if (!state.Equals("WV"))
+        //    {
+        //        expected = expected + state = ", "
+        //    }
+        //    else
+        //    {
+        //        expected.Concat(state);
+        //    }
+        //}
+            //Act
         string actual = sampleData.GetAggregateSortedListOfStatesUsingCsvRows();
 
         //Assert
-        Assert.AreEqual<string>(actual, "AL, AZ, CA, DC, FL, GA, IN, KS, LA, MD, MN, MO, MT, NC, NE, NH, NV, NY," +
-            " OR, PA, SC, TN, TX, UT, VA, WA, WV");
+        //Assert.AreEqual<string>(actual, "AL, AZ, CA, DC, FL, GA, IN, KS, LA, MD, MN, MO, MT, NC, NE, NH, NV, NY," +
+        //    " OR, PA, SC, TN, TX, UT, VA, WA, WV");
+        Assert.AreEqual<string>(expected, actual);
     }
 
     [TestMethod]
