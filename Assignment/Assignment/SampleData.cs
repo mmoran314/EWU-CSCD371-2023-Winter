@@ -13,11 +13,6 @@ namespace Assignment
         // 2.
         public IEnumerable<string> GetUniqueSortedListOfStatesGivenCsvRows()
         {
-            ////IEnumerable<string> states = new List<string>();
-            //foreach (var row in CsvRows) 
-            //{
-                
-            //}
             return CsvRows.Select(row => row.Split(",")[6]).Distinct().ToImmutableSortedSet();
         }
 
@@ -53,7 +48,8 @@ namespace Assignment
 
                     persons.Add(person);
                 }
-                return persons.OrderBy(person => person.Address.State);
+                return persons.OrderBy(person => person.Address.State).ThenBy(person => person.Address.City)
+                    .ThenBy(person => person.Address.Zip);
             }
         }
 
@@ -62,7 +58,7 @@ namespace Assignment
         // 5.
         public IEnumerable<(string FirstName, string LastName)> FilterByEmailAddress(Predicate<string> filter)
         {
-            //IEnumerable<(string, string)> filtered = People.Where(person => filter(person.EmailAddress)).ToList();
+            
             List<IPerson> filtered = People.Where(person => filter(person.EmailAddress)).ToList();
             List<(string, string)> personList = new List<(string, string)>();
             foreach (IPerson person in filtered)

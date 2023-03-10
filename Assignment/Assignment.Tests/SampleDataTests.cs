@@ -47,7 +47,7 @@ public class SampleDataTests
 
     }
     [TestMethod]
-    public void TestUsingHardcodedAddressList()
+    public void TestGetUniqueSortedListOfStatesGivenCsvRows_GivenHardcodedList()
     {
         //Arrange
         List<Address> addresses = new();
