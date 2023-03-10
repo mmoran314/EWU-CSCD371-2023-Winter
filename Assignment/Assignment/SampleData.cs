@@ -72,15 +72,17 @@ namespace Assignment
         public string GetAggregateListOfStatesGivenPeopleCollection(IEnumerable<IPerson> people)
         {
             IEnumerable<string> states = People.Select(p => p.Address.State).Distinct();
-            StringBuilder statesString = states.Aggregate(new StringBuilder(), (a, b) => {
-                if (a.Length > 0)
-                {
-                    a.Append(", ");
-                }
-                a.Append(b);
-                return a;
-            });
-            return statesString.ToString();
+            //StringBuilder statesString = states.Aggregate(new StringBuilder(), (a, b) => {
+            //    if (a.Length > 0)
+            //    {
+            //        a.Append(", ");
+            //    }
+            //    a.Append(b);
+            //    return a;
+            //});
+            //return statesString.ToString();
+            string aggPeopleList = states.Aggregate((a, b) => (a + ", " + b));
+            return aggPeopleList;
         }
     }
 }

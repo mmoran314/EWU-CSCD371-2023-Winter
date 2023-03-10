@@ -83,7 +83,7 @@ public class NodeTests
 
     [TestMethod]
     public void TestChildItems()
-    { //TODO change
+    { 
         //Arrange
         node.Append(2);
         node.Append(3);
@@ -93,4 +93,5 @@ public class NodeTests
         Assert.AreEqual<int>(2, actual.Count());
 
     }
+
 }
