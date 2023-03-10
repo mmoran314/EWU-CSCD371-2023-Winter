@@ -13,7 +13,7 @@ namespace Assignment
         // 2.
         public IEnumerable<string> GetUniqueSortedListOfStatesGivenCsvRows()
         {
-            return CsvRows.Select(row => row.Split(",")[6]).Distinct().ToImmutableSortedSet();
+            return CsvRows.Select(row => row.Split(",")[6]).Distinct().OrderBy(state => state);
         }
 
         // 3.
