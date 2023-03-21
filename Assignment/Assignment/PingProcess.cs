@@ -58,7 +58,7 @@ public class PingProcess
         stringBuilder.Append(all.Aggregate("", (compiledString, currentString) => compiledString.Trim() + currentString.Result.StdOutput));
         return new PingResult(total, stringBuilder?.ToString().Trim());
     }
-     async public Task<PingResult> RunLongRunningAsync(string hostNameOrAddress, CancellationToken token= default)
+     async public Task<PingResult> RunLongRunningAsync(string hostNameOrAddress, CancellationToken token= default)// Test is not passing yet
     {
         StartInfo.Arguments = hostNameOrAddress;
         StringBuilder? sb = null;
@@ -71,8 +71,7 @@ public class PingProcess
         ProcessStartInfo startInfo, Action<string?>? progressOutput, Action<string?>? progressError, CancellationToken token)
 
     {
-        //StringBuilder? stringBuilder = null;
-        //void updateStdOutput(string? line) => (stringBuilder ??= new StringBuilder()).AppendLine(line);
+        // Test is not passing yet
         Process task = await Task.Factory.StartNew(() => RunProcessInternal(startInfo, progressOutput, progressError, token), token,
             TaskCreationOptions.LongRunning, TaskScheduler.Current);
         return new PingResult(task.ExitCode, progressOutput!.ToString());
