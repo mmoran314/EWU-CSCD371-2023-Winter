@@ -147,7 +147,7 @@ public class PingProcessTests
         int lineCount = stringBuilder.ToString().Split(Environment.NewLine).Length;
         Assert.AreNotEqual(lineCount, numbers.Count()+1);
     }
-
+    // Changed for how pings seem to work for my machine.
     readonly string PingOutputLikeExpression = @"
 Pinging * with 32 bytes of data:
 Reply from *.*.*.*: bytes=* time<*
