@@ -27,40 +27,56 @@ public class PingProcess
 
     public Task<PingResult> RunTaskAsync(string hostNameOrAddress)
     {
-        throw new NotImplementedException();
+        Task<PingResult> result = Task.Run(() => Run(hostNameOrAddress));
+        return result;
+      
     }
 
     async public Task<PingResult> RunAsync(
         string hostNameOrAddress, CancellationToken cancellationToken = default)
     {
-        Task task = null!;
+        cancellationToken.ThrowIfCancellationRequested();
+        Task<PingResult> task = Task.Run(() => Run(hostNameOrAddress), cancellationToken);
         await task;
-        throw new NotImplementedException();
+        return task.Result;
     }
 
-    async public Task<PingResult> RunAsync(params string[] hostNameOrAddresses)
+    async public Task<PingResult> RunAsync(IEnumerable<string> hostNameOrAddresses, CancellationToken cancellationToken = default)
     {
-        StringBuilder? stringBuilder = null;
-        ParallelQuery<Task<int>>? all = hostNameOrAddresses.AsParallel().Select(async item =>
+        StringBuilder? stringBuilder = new();
+        ParallelQuery<Task<PingResult>>? all = hostNameOrAddresses.AsParallel().Select(async item =>
         {
-            Task<PingResult> task = null!;
-            // ...
+            Task<PingResult> task = Task.Run(() => Run(item), cancellationToken);
+
 
             await task.WaitAsync(default(CancellationToken));
-            return task.Result.ExitCode;
+            return task.Result;
         });
 
         await Task.WhenAll(all);
-        int total = all.Aggregate(0, (total, item) => total + item.Result);
-        return new PingResult(total, stringBuilder?.ToString());
+        int total = all.Aggregate(0, (total, item) => total + item.Result.ExitCode);
+        stringBuilder.Append(all.Aggregate("", (compiledString, currentString) => compiledString.Trim() + currentString.Result.StdOutput));
+        return new PingResult(total, stringBuilder?.ToString().Trim());
+    }
+     async public Task<PingResult> RunLongRunningAsync(string hostNameOrAddress, CancellationToken token= default)
+    {
+        StartInfo.Arguments = hostNameOrAddress;
+        StringBuilder? sb = null;
+        void updateStdOutput(string? line) =>
+            (sb ??= new StringBuilder()).AppendLine(line);
+        return await RunLongRunningAsync(StartInfo, updateStdOutput, default, default);
     }
 
     async public Task<PingResult> RunLongRunningAsync(
-        string hostNameOrAddress, CancellationToken cancellationToken = default)
+        ProcessStartInfo startInfo, Action<string?>? progressOutput, Action<string?>? progressError, CancellationToken token)
+
     {
-        Task task = null!;
-        await task;
-        throw new NotImplementedException();
+        //StringBuilder? stringBuilder = null;
+        //void updateStdOutput(string? line) => (stringBuilder ??= new StringBuilder()).AppendLine(line);
+        Process task = await Task.Factory.StartNew(() => RunProcessInternal(startInfo, progressOutput, progressError, token), token,
+            TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        return new PingResult(task.ExitCode, progressOutput!.ToString());
+        
     }
 
     private Process RunProcessInternal(

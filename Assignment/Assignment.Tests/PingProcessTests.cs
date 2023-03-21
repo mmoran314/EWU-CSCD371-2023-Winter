@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Assignment.Tests;
@@ -59,35 +60,40 @@ public class PingProcessTests
     {
         // Do NOT use async/await in this test.
         // Test Sut.RunTaskAsync("localhost");
+        Task<PingResult> result = Sut.RunTaskAsync("localhost");
+        AssertValidPingOutput(result.Result);
     }
 
     [TestMethod]
     public void RunAsync_UsingTaskReturn_Success()
     {
         // Do NOT use async/await in this test.
-        PingResult result = default;
+       // PingResult result = default;
         // Test Sut.RunAsync("localhost");
-        AssertValidPingOutput(result);
+        Task<PingResult> result = Sut.RunAsync("localhost");
+        AssertValidPingOutput(result.Result);
     }
 
     [TestMethod]
-#pragma warning disable CS1998 // Remove this
     async public Task RunAsync_UsingTpl_Success()
     {
         // DO use async/await in this test.
-        PingResult result = default;
+        PingResult result = await Sut.RunAsync("localhost");
 
         // Test Sut.RunAsync("localhost");
         AssertValidPingOutput(result);
     }
-#pragma warning restore CS1998 // Remove this
 
 
     [TestMethod]
     [ExpectedException(typeof(AggregateException))]
     public void RunAsync_UsingTplWithCancellation_CatchAggregateExceptionWrapping()
     {
-        
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        CancellationToken cancellationToken = cancellationTokenSource.Token;
+        cancellationTokenSource.Cancel(); 
+        Task<PingResult> result = Sut.RunAsync("localhost",  cancellationToken);
+        AssertValidPingOutput(result.Result);
     }
 
     [TestMethod]
@@ -95,6 +101,19 @@ public class PingProcessTests
     public void RunAsync_UsingTplWithCancellation_CatchAggregateExceptionWrappingTaskCanceledException()
     {
         // Use exception.Flatten()
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        CancellationToken cancellationToken = cancellationTokenSource.Token;
+        cancellationTokenSource.Cancel();
+        Task<PingResult> result = Sut.RunAsync("localhost", cancellationToken);
+        try
+        {
+            AssertValidPingOutput(result.Result);
+        }
+        catch(AggregateException ex)
+        {
+            Exception taskCanceledException = ex.Flatten();
+            throw taskCanceledException.InnerException!;
+        }
     }
 
     [TestMethod]
@@ -109,14 +128,16 @@ public class PingProcessTests
     }
 
     [TestMethod]
-#pragma warning disable CS1998 // Remove this
+ // Remove this
     async public Task RunLongRunningAsync_UsingTpl_Success()
     {
-        PingResult result = default;
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        CancellationToken cancellationToken = cancellationTokenSource.Token;
+
+        PingResult result = await Sut.RunLongRunningAsync("ping", cancellationToken);
         // Test Sut.RunLongRunningAsync("localhost");
         AssertValidPingOutput(result);
     }
-#pragma warning restore CS1998 // Remove this
 
     [TestMethod]
     public void StringBuilderAppendLine_InParallel_IsNotThreadSafe()
@@ -130,12 +151,12 @@ public class PingProcessTests
 
     readonly string PingOutputLikeExpression = @"
 Pinging * with 32 bytes of data:
-Reply from ::1: time<*
-Reply from ::1: time<*
-Reply from ::1: time<*
-Reply from ::1: time<*
+Reply from *.*.*.*: bytes=* time<*
+Reply from *.*.*.*: bytes=* time<*
+Reply from *.*.*.*: bytes=* time<*
+Reply from *.*.*.*: bytes=* time<*
 
-Ping statistics for ::1:
+Ping statistics for *.*.*.*:
     Packets: Sent = *, Received = *, Lost = 0 (0% loss),
 Approximate round trip times in milli-seconds:
     Minimum = *, Maximum = *, Average = *".Trim();
