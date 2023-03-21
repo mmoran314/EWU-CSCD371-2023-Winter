@@ -68,7 +68,6 @@ public class PingProcessTests
     public void RunAsync_UsingTaskReturn_Success()
     {
         // Do NOT use async/await in this test.
-       // PingResult result = default;
         // Test Sut.RunAsync("localhost");
         Task<PingResult> result = Sut.RunAsync("localhost");
         AssertValidPingOutput(result.Result);
@@ -77,10 +76,10 @@ public class PingProcessTests
     [TestMethod]
     async public Task RunAsync_UsingTpl_Success()
     {
-        // DO use async/await in this test.
+        
         PingResult result = await Sut.RunAsync("localhost");
 
-        // Test Sut.RunAsync("localhost");
+       
         AssertValidPingOutput(result);
     }
 
@@ -100,7 +99,7 @@ public class PingProcessTests
     [ExpectedException(typeof(TaskCanceledException))]
     public void RunAsync_UsingTplWithCancellation_CatchAggregateExceptionWrappingTaskCanceledException()
     {
-        // Use exception.Flatten()
+        
         CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         CancellationToken cancellationToken = cancellationTokenSource.Token;
         cancellationTokenSource.Cancel();
@@ -128,14 +127,14 @@ public class PingProcessTests
     }
 
     [TestMethod]
- // Remove this
+
     async public Task RunLongRunningAsync_UsingTpl_Success()
     {
         CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         CancellationToken cancellationToken = cancellationTokenSource.Token;
 
         PingResult result = await Sut.RunLongRunningAsync("ping", cancellationToken);
-        // Test Sut.RunLongRunningAsync("localhost");
+        
         AssertValidPingOutput(result);
     }
 

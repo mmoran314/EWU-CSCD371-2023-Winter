@@ -55,7 +55,7 @@ public class PingProcess
 
         await Task.WhenAll(all);
         int total = all.Aggregate(0, (total, item) => total + item.Result.ExitCode);
-        stringBuilder.Append(all.Aggregate("", (compiledString, currentString) => compiledString.Trim() + currentString.Result.StdOutput));
+        stringBuilder.Append(all.Aggregate("", (s1, s2) => s1.Trim() + s2.Result.StdOutput));
         return new PingResult(total, stringBuilder?.ToString().Trim());
     }
      async public Task<PingResult> RunLongRunningAsync(string hostNameOrAddress, CancellationToken token= default)// Test is not passing yet
