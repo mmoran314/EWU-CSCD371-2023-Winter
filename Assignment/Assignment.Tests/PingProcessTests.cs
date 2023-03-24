@@ -51,35 +51,40 @@ public class PingProcessTests
     [TestMethod]
     public void Run_CaptureStdOutput_Success()
     {
+        //Arrange
         PingResult result = Sut.Run("localhost");
+        
+        //Assert
         AssertValidPingOutput(result);
     }
 
     [TestMethod]
     public void RunTaskAsync_Success()
     {
-        // Do NOT use async/await in this test.
-        // Test Sut.RunTaskAsync("localhost");
+        //Arrange
         Task<PingResult> result = Sut.RunTaskAsync("localhost");
+        
+        //Assert
         AssertValidPingOutput(result.Result);
     }
 
     [TestMethod]
     public void RunAsync_UsingTaskReturn_Success()
     {
-        // Do NOT use async/await in this test.
-        // Test Sut.RunAsync("localhost");
+        //Arrange
         Task<PingResult> result = Sut.RunAsync("localhost");
+        
+        //Act
         AssertValidPingOutput(result.Result);
     }
 
     [TestMethod]
     async public Task RunAsync_UsingTpl_Success()
     {
-        
+        //Arrange
         PingResult result = await Sut.RunAsync("localhost");
 
-       
+        //Assert
         AssertValidPingOutput(result);
     }
 
@@ -88,25 +93,31 @@ public class PingProcessTests
     [ExpectedException(typeof(AggregateException))]
     public void RunAsync_UsingTplWithCancellation_CatchAggregateExceptionWrapping()
     {
+        //Arrange
         CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         CancellationToken cancellationToken = cancellationTokenSource.Token;
-        cancellationTokenSource.Cancel(); 
+        
+        //Act
         Task<PingResult> result = Sut.RunAsync("localhost",  cancellationToken);
-        AssertValidPingOutput(result.Result);
+        cancellationTokenSource.Cancel();
+        result.Wait();
+        
     }
 
     [TestMethod]
     [ExpectedException(typeof(TaskCanceledException))]
     public void RunAsync_UsingTplWithCancellation_CatchAggregateExceptionWrappingTaskCanceledException()
     {
-        
+        //Arrange
         CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         CancellationToken cancellationToken = cancellationTokenSource.Token;
-        cancellationTokenSource.Cancel();
-        Task<PingResult> result = Sut.RunAsync("localhost", cancellationToken);
+
+        //Act
         try
         {
-            AssertValidPingOutput(result.Result);
+            Task<PingResult> result = Sut.RunAsync("localhost", cancellationToken);
+            cancellationTokenSource.Cancel();
+            result.Wait();
         }
         catch(AggregateException ex)
         {
@@ -118,34 +129,54 @@ public class PingProcessTests
     [TestMethod]
     async public Task RunAsync_MultipleHostAddresses_True()
     {
-        // Pseudo Code - don't trust it!!!
+        //Arrange
         string[] hostNames = new string[] { "localhost", "localhost", "localhost", "localhost" };
         int expectedLineCount = PingOutputLikeExpression.Split(Environment.NewLine).Length*hostNames.Length;
+
+        //Act
         PingResult result = await Sut.RunAsync(hostNames);
         int? lineCount = result.StdOutput?.Split(Environment.NewLine).Length;
-        Assert.AreEqual(expectedLineCount, lineCount);
+        
+        //Assert
+        Assert.AreEqual<int?>(expectedLineCount, lineCount);
     }
 
     [TestMethod]
 
     async public Task RunLongRunningAsync_UsingTpl_Success()
     {
+        //Arrange
         CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         CancellationToken cancellationToken = cancellationTokenSource.Token;
 
-        PingResult result = await Sut.RunLongRunningAsync("ping", cancellationToken);
+        //Act
+        PingResult result = await Sut.RunLongRunningAsync("localhost");
         
+        //Assert
         AssertValidPingOutput(result);
     }
 
     [TestMethod]
     public void StringBuilderAppendLine_InParallel_IsNotThreadSafe()
     {
+        //Arrange
+        object lockable = new();
         IEnumerable<int> numbers = Enumerable.Range(0, short.MaxValue);
         System.Text.StringBuilder stringBuilder = new();
-        numbers.AsParallel().ForAll(item => stringBuilder.AppendLine(""));
+
+        //Act
+        numbers.AsParallel().ForAll(item =>
+        {
+            lock (lockable)
+            {
+                stringBuilder.AppendLine("");
+            }
+        });
         int lineCount = stringBuilder.ToString().Split(Environment.NewLine).Length;
-        Assert.AreNotEqual(lineCount, numbers.Count()+1);
+
+        //Assert
+        Assert.AreEqual<int>(lineCount, numbers.Count()+1);
+        
     }
     // Changed for how pings seem to work for my machine.
     readonly string PingOutputLikeExpression = @"

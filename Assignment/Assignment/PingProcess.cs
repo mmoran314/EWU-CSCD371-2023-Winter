@@ -27,8 +27,8 @@ public class PingProcess
 
     public Task<PingResult> RunTaskAsync(string hostNameOrAddress)
     {
-        Task<PingResult> result = Task.Run(() => Run(hostNameOrAddress));
-        return result;
+        return Task.Run(() => Run(hostNameOrAddress));
+        
       
     }
 
@@ -37,8 +37,8 @@ public class PingProcess
     {
         cancellationToken.ThrowIfCancellationRequested();
         Task<PingResult> task = Task.Run(() => Run(hostNameOrAddress), cancellationToken);
-        await task;
-        return task.Result;
+        return await task.WaitAsync(cancellationToken);
+        
     }
 
     async public Task<PingResult> RunAsync(IEnumerable<string> hostNameOrAddresses, CancellationToken cancellationToken = default)
@@ -48,12 +48,11 @@ public class PingProcess
         {
             Task<PingResult> task = Task.Run(() => Run(item), cancellationToken);
 
-
-            await task.WaitAsync(default(CancellationToken));
+            await task.WaitAsync(cancellationToken);
             return task.Result;
         });
 
-        await Task.WhenAll(all);
+        await Task.WhenAll(all).WaitAsync(cancellationToken);
         int total = all.Aggregate(0, (total, item) => total + item.Result.ExitCode);
         stringBuilder.Append(all.Aggregate("", (s1, s2) => s1.Trim() + s2.Result.StdOutput));
         return new PingResult(total, stringBuilder?.ToString().Trim());
@@ -64,17 +63,19 @@ public class PingProcess
         StringBuilder? sb = null;
         void updateStdOutput(string? line) =>
             (sb ??= new StringBuilder()).AppendLine(line);
-        return await RunLongRunningAsync(StartInfo, updateStdOutput, default, default);
+        int exit = await RunLongRunningAsync(StartInfo, updateStdOutput, default, token);
+        PingResult result = new(exit, sb?.ToString());
+        return result;
     }
 
-    async public Task<PingResult> RunLongRunningAsync(
+    async public Task<int> RunLongRunningAsync(
         ProcessStartInfo startInfo, Action<string?>? progressOutput, Action<string?>? progressError, CancellationToken token)
 
     {
-        // Test is not passing yet
-        Process task = await Task.Factory.StartNew(() => RunProcessInternal(startInfo, progressOutput, progressError, token), token,
+        
+        return await Task.Factory.StartNew<int>(() => RunProcessInternal(startInfo, progressOutput, progressError, token).ExitCode, token,
             TaskCreationOptions.LongRunning, TaskScheduler.Current);
-        return new PingResult(task.ExitCode, progressOutput!.ToString());
+      
         
     }
 
